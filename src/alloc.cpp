@@ -26,6 +26,15 @@ struct memblock
 
 memblock *HEAD = new memblock;
 
+memblock* find_block(size_t num)
+{
+    for (memblock *it = HEAD; it != nullptr; it = it->next)
+        if (it->size >= num && it->is_free)
+            return it;
+
+    return nullptr;
+}
+
 void* my_malloc(size_t num)
 {
     memblock* block = find_block(num);
@@ -62,13 +71,15 @@ void my_free(void *p)
     memblock *target;
     for (target = HEAD; target != nullptr; target = target->next)
         if (target->ptr == p)
-    
+            break;
     target->is_free = true;
 
     // смотрим влево
     memblock *it1 = target->prev;
     if (it1 && it1->is_free)
     {
+
+        
         target->prev = it1->prev;
         if (it1->prev)
             it1->prev->next = target;
@@ -124,15 +135,6 @@ void* my_realloc(void *block, size_t size)
     return p;
 }
 
-memblock* find_block(size_t num)
-{
-    for (memblock *it = HEAD; it != nullptr; it = it->next)
-        if (it->size >= num && it->is_free)
-            return it;
-
-    return nullptr;
-}
-
 // вызывается в конце
 void free_block_structure()
 {
@@ -155,3 +157,15 @@ void print_mem()
         std::cout << MEMORY_ARRAY[i] << std::endl;
 }
 
+void print_block_state()
+{
+    using std::endl;
+    memblock *t1 = HEAD;
+    int i = 0;
+    while (t1)
+    {
+        std::cout << "block " << i++ << endl;
+        std::cout << t1->is_free << endl << t1->size << endl << endl;
+        t1 = t1->next;
+    }
+}
