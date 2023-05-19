@@ -78,16 +78,17 @@ void my_free(void *p)
     memblock *it1 = target->prev;
     if (it1 && it1->is_free)
     {
+        target = target->prev;
+        it1 = it1->next;
 
-        
-        target->prev = it1->prev;
-        if (it1->prev)
-            it1->prev->next = target;
+        target->next = it1->next;
+        if (it1->next)
+            it1->next->prev = target;
 
-        target->ptr = it1->ptr;
         target->size += it1->size;
 
         delete it1;
+        
     }
 
     memblock *it2 = target->next;
